@@ -33,7 +33,7 @@ module Alchemy #:nodoc:
           attr_writer :validation_errors
           include Alchemy::Essence::InstanceMethods
           stampable stamper_class_name: Alchemy.user_class_name
-          validate :validate_ingredient, :on => :update, :if => 'validations.any?'
+          validate :validate_ingredient, :on => :update, :if => :validations_any?
 
           has_one :content, :as => :essence, class_name: "Alchemy::Content"
           has_one :element, :through => :content, class_name: "Alchemy::Element"
@@ -47,6 +47,10 @@ module Alchemy #:nodoc:
           delegate :public?,     to: :element, allow_nil: true
 
           after_update :touch_content
+
+          def validations_any?
+            validations.any?
+          end
 
           def acts_as_essence_class
             #{name}
