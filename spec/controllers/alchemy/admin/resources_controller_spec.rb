@@ -1,7 +1,6 @@
-require "spec_helper"
+# frozen_string_literal: true
 
-class Admin::EventsController < Alchemy::Admin::ResourcesController
-end
+require "spec_helper"
 
 describe Admin::EventsController do
   it "should include ResourcesHelper" do
@@ -24,7 +23,7 @@ describe Admin::EventsController do
     end
 
     context 'with search query given' do
-      let(:params) { {q: {name_or_hidden_name_or_location_name_cont: "PeTer"}} }
+      let(:params) { {q: {name_or_hidden_name_or_description_or_location_name_cont: "PeTer"}} }
 
       it "returns only matching records" do
         get :index, params: params
@@ -34,7 +33,7 @@ describe Admin::EventsController do
 
       context "but searching for record with certain association" do
         let(:bauwagen) { create(:location, name: 'Bauwagen') }
-        let(:params)   { {q: {name_or_hidden_name_or_location_name_cont: "Bauwagen"}} }
+        let(:params)   { {q: {name_or_hidden_name_or_description_or_location_name_cont: "Bauwagen"}} }
 
         before do
           peter.location = bauwagen
@@ -51,32 +50,58 @@ describe Admin::EventsController do
   end
 
   describe '#update' do
-    let(:params) { {q: 'some_query', page: 6} }
-    let!(:peter)  { create(:event, name: 'Peter') }
+    let(:params) { {q: {name_or_hidden_name_or_description_or_location_name_cont: 'some_query'}, page: 6} }
 
-    it 'redirects to index, keeping the current location parameters' do
-      post :update, params: {id: peter.id, event: {name: "Hans"}}.merge(params)
-      expect(response.redirect_url).to eq("http://test.host/admin/events?page=6&q=some_query")
+    context 'with regular noun model name' do
+      let(:peter) { create(:event, name: 'Peter') }
+
+      it 'redirects to index, keeping the current location parameters' do
+        post :update, params: {id: peter.id, event: {name: "Hans"}}.merge(params)
+        expect(response.redirect_url).to eq("http://test.host/admin/events?page=6&q%5Bname_or_hidden_name_or_description_or_location_name_cont%5D=some_query")
+      end
+    end
+
+    context 'with zero plural noun model name' do
+      let!(:peter) { create(:series, name: 'Peter') }
+      let(:params) { {q: { name_cont: 'some_query'}, page: 6} }
+
+      it 'redirects to index, keeping the current location parameters' do
+        expect(controller).to receive(:controller_path) { 'admin/series' }
+        post :update, params: {id: peter.id, series: {name: "Hans"}}.merge(params)
+        expect(response.redirect_url).to eq("http://test.host/admin/series?page=6&q%5Bname_cont%5D=some_query")
+      end
     end
   end
 
   describe '#create' do
-    let(:params) { {q: 'some_query', page: 6} }
+    let(:params) { {q: {name_or_hidden_name_or_description_or_location_name_cont: 'some_query'}, page: 6} }
     let!(:location) { create(:location) }
 
-    it 'redirects to index, keeping the current location parameters' do
-      post :create, params: {event: {name: "Hans", location_id: location.id}}.merge(params)
-      expect(response.redirect_url).to eq("http://test.host/admin/events?page=6&q=some_query")
+    context 'with regular noun model name' do
+      it 'redirects to index, keeping the current location parameters' do
+        post :create, params: {event: {name: "Hans", location_id: location.id}}.merge(params)
+        expect(response.redirect_url).to eq("http://test.host/admin/events?page=6&q%5Bname_or_hidden_name_or_description_or_location_name_cont%5D=some_query")
+      end
+    end
+
+    context 'with zero plural noun model name' do
+      let(:params) { {q: {name_cont: 'some_query'}, page: 6} }
+
+      it 'redirects to index, keeping the current location parameters' do
+        expect(controller).to receive(:controller_path) { 'admin/series' }
+        post :create, params: {series: {name: "Hans"}}.merge(params)
+        expect(response.redirect_url).to eq("http://test.host/admin/series?page=6&q%5Bname_cont%5D=some_query")
+      end
     end
   end
 
   describe '#destroy' do
-    let(:params) { {q: 'some_query', page: 6} }
+    let(:params) { {q: {name_or_hidden_name_or_description_or_location_name_cont: 'some_query'}, page: 6} }
     let!(:peter)  { create(:event, name: 'Peter') }
 
     it 'redirects to index, keeping the current location parameters' do
       delete :destroy, params: {id: peter.id}.merge(params)
-      expect(response.redirect_url).to eq("http://test.host/admin/events?page=6&q=some_query")
+      expect(response.redirect_url).to eq("http://test.host/admin/events?page=6&q%5Bname_or_hidden_name_or_description_or_location_name_cont%5D=some_query")
     end
   end
 end

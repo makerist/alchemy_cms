@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Alchemy
@@ -9,9 +11,10 @@ module Alchemy
 
       before do
         2.times { create(:alchemy_element, page: page) }
+        create(:alchemy_element, :nested, page: page)
       end
 
-      it "returns all public elements as json objects" do
+      it "returns all public not nested elements as json objects" do
         get :index, params: {format: :json}
 
         expect(response.status).to eq(200)
@@ -20,7 +23,8 @@ module Alchemy
         result = JSON.parse(response.body)
 
         expect(result).to have_key('elements')
-        expect(result['elements'].size).to eq(Alchemy::Element.count)
+        expect(result['elements'].last['nested_elements']).to_not be_empty
+        expect(result['elements'].size).to eq(Alchemy::Element.not_nested.count)
       end
 
       context 'with page_id param' do
@@ -42,7 +46,7 @@ module Alchemy
       end
 
       context 'with empty page_id param' do
-        it "returns all elements" do
+        it "returns all not nested elements" do
           get :index, params: {page_id: '', format: :json}
 
           expect(response.status).to eq(200)
@@ -51,7 +55,7 @@ module Alchemy
           result = JSON.parse(response.body)
 
           expect(result).to have_key('elements')
-          expect(result['elements'].size).to eq(Alchemy::Element.count)
+          expect(result['elements'].size).to eq(Alchemy::Element.not_nested.count)
         end
       end
 
@@ -73,7 +77,7 @@ module Alchemy
       end
 
       context 'with empty named param' do
-        it "returns all elements" do
+        it "returns all not nested elements" do
           get :index, params: {named: '', format: :json}
 
           expect(response.status).to eq(200)
@@ -82,7 +86,25 @@ module Alchemy
           result = JSON.parse(response.body)
 
           expect(result).to have_key('elements')
-          expect(result['elements'].size).to eq(Alchemy::Element.count)
+          expect(result['elements'].size).to eq(Alchemy::Element.not_nested.count)
+        end
+      end
+
+      context 'as author' do
+        before do
+          authorize_user(build(:alchemy_dummy_user, :as_author))
+        end
+
+        it "returns all not nested elements" do
+          get :index, params: {format: :json}
+
+          expect(response.status).to eq(200)
+          expect(response.content_type).to eq('application/json')
+
+          result = JSON.parse(response.body)
+
+          expect(result).to have_key('elements')
+          expect(result['elements'].size).to eq(Alchemy::Element.not_nested.count)
         end
       end
     end

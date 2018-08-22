@@ -21,11 +21,12 @@
 #
 
 module Alchemy
-  class Picture < ActiveRecord::Base
+  class Picture < BaseRecord
     CONVERTIBLE_FILE_FORMATS = %w(gif jpg jpeg png).freeze
 
     include Alchemy::NameConversions
-    include Alchemy::Touching
+    include Alchemy::Taggable
+    include Alchemy::ContentTouching
     include Alchemy::Picture::Transformations
     include Alchemy::Picture::Url
 
@@ -69,8 +70,6 @@ module Alchemy
       case_sensitive: false,
       message: Alchemy.t("not a valid image")
 
-    acts_as_taggable
-
     stampable stamper_class_name: Alchemy.user_class_name
 
     scope :named, ->(name) {
@@ -86,10 +85,8 @@ module Alchemy
     }
 
     scope :without_tag, -> {
-      where("#{table_name}.cached_tag_list IS NULL OR #{table_name}.cached_tag_list = ''")
+      left_outer_joins(:taggings).where(gutentag_taggings: {id: nil})
     }
-
-    after_update :touch_contents
 
     # Class methods
 

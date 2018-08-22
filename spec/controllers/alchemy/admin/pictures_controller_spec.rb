@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.shared_examples :redirecting_to_picture_library do
@@ -50,11 +52,24 @@ module Alchemy
       context 'with tag params' do
         let!(:picture_1) { create(:alchemy_picture, tag_list: %w(water)) }
         let!(:picture_2) { create(:alchemy_picture, tag_list: %w(kitten)) }
+        let!(:picture_3) { create(:alchemy_picture, tag_list: %w(water nature)) }
 
         it 'assigns @pictures with filtered pictures' do
           get :index, params: {tagged_with: 'water'}
           expect(assigns(:pictures)).to include(picture_1)
           expect(assigns(:pictures)).to_not include(picture_2)
+          expect(assigns(:pictures)).to include(picture_3)
+        end
+      end
+
+      context 'with multiple tag params' do
+        let!(:picture_1) { create(:alchemy_picture, tag_list: %w(water)) }
+        let!(:picture_2) { create(:alchemy_picture, tag_list: %w(water nature)) }
+
+        it 'assigns @pictures with filtered pictures' do
+          get :index, params: {tagged_with: 'water,nature'}
+          expect(assigns(:pictures)).to_not include(picture_1)
+          expect(assigns(:pictures)).to include(picture_2)
         end
       end
 
@@ -140,9 +155,9 @@ module Alchemy
         let!(:content) { create(:alchemy_content, element: element) }
         let!(:essence) { create(:alchemy_essence_picture, content: content, picture: picture) }
 
-        it 'assigns @pages to assignments grouped by page' do
+        it 'assigns all essence pictures having an assignment to @assignments' do
           get :show, params: {id: picture.id}
-          expect(assigns(:pages)).to eq({page => [essence]})
+          expect(assigns(:assignments)).to eq([essence])
         end
       end
 

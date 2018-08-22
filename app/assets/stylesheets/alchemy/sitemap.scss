@@ -24,12 +24,10 @@
 }
 
 .sitemap_pagename_link {
-  background-color: #fff;
-  color: black;
   display: block;
-  padding: 0 3*$default-padding;
+  padding: 0 10px;
+  margin: 2px;
   text-decoration: none;
-  transition: background-color, 400ms;
 
   &.inactive {
     color: #656565;
@@ -39,9 +37,9 @@
 .redirect_url {
   float: right;
   text-align: right;
-  background-color: #fff0c4;
+  background-color: $sitemap-info-background-color;
   line-height: $sitemap-line-height;
-  font-size: 10px;
+  font-size: $small-font-size;
   padding: 0 2*$default-padding;
   max-width: 45%;
   white-space: nowrap;
@@ -53,7 +51,9 @@
   height: 230px;
   background-color: $light-gray;
   margin-bottom: 4px;
-  border: 1px inset #e8e8e8;
+  border-width: $form-field-border-width;
+  border-style: $form-field-border-style;
+  border-color: $form-field-border-color;
   overflow: auto;
   padding: 4px 0 0 4px;
   border-radius: $default-border-radius;
@@ -81,33 +81,39 @@
   height: $sitemap-line-height;
   margin: 3*$default-margin 0;
   position: relative;
+  transition: background-color $transition-duration;
 
-  &.highlight .sitemap_pagename_link {
-    background-color: #FFFBA5;
+  &.highlight {
+    background-color: $sitemap-highlight-color;
   }
 
   &.no-match .sitemap_pagename_link {
     color: $medium-gray;
   }
 
-  &:hover .sitemap_pagename_link {
-    background-color: $light_yellow;
+  &:hover {
+    background-color: $sitemap-page-hover-color;
+    border-radius: $default-border-radius;
   }
 }
 
 .sitemap_sitename {
-  line-height: $sitemap-line-height;
+  @include border-left-radius($default-border-radius);
+  line-height: $sitemap-line-height - 4;
   overflow: hidden;
+  background-color: $sitemap-page-background-color;
+
+  &.without-status {
+    @include border-right-radius($default-border-radius);
+  }
 }
 
 .sitemap_left_images {
-  @extend .left-rounded-border;
   position: relative;
   width: 32px;
   line-height: $sitemap-line-height;
   float: left;
   padding: 0 2*$default-padding;
-  background-color: rgba(#fff, .75);
   text-align: center;
 }
 
@@ -171,7 +177,7 @@
   li {
     padding-left: 0;
 
-    .selected_page a {
+    .selected_page {
       background-color: $linked-color;
       color: $dark-gray;
     }
@@ -185,7 +191,7 @@
 
 .page_infos {
   @extend .right-rounded-border;
-  background-color: rgba(#fff, .75);
+  background-color: $sitemap-page-background-color;
   border-left: 1px solid $light-gray;
   float: right;
   height: $sitemap-line-height;

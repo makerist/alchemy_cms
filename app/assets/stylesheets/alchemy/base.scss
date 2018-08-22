@@ -1,10 +1,11 @@
 html {
   box-sizing: border-box;
   height: 100%;
+  font-size: $base-font-size;
 
   &.turbolinks-progress-bar::before,
   .turbolinks-progress-bar {
-    background-color: #fff !important;
+    background-color: $blue !important;
     z-index: 400001;
   }
 }
@@ -37,7 +38,7 @@ body {
   padding: 0;
   color: $text-color;
   font: $default-font-style;
-  background-color: $light-gray;
+  background-color: $body-background-color;
   height: 100%;
   cursor: default;
 
@@ -95,14 +96,13 @@ a {
     text-decoration: underline;
   }
 
-  &:focus {
-    @extend %blue-focus-style;
-    color: black;
-  }
-
   img {
     border: none;
   }
+}
+
+a:focus, [tabindex]:focus {
+  @include default-focus-style;
 }
 
 form {

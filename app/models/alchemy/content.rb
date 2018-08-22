@@ -17,16 +17,15 @@
 #
 
 module Alchemy
-  class Content < ActiveRecord::Base
+  class Content < BaseRecord
     include Alchemy::Logger
-    include Alchemy::Touching
     include Alchemy::Hints
 
     # Concerns
     include Alchemy::Content::Factory
 
-    belongs_to :essence, required: true, polymorphic: true, dependent: :destroy
-    belongs_to :element, required: true, touch: true
+    belongs_to :essence, polymorphic: true, dependent: :destroy
+    belongs_to :element, touch: true, inverse_of: :contents
     has_one :page, through: :element
 
     stampable stamper_class_name: Alchemy.user_class_name

@@ -21,8 +21,8 @@
 #
 
 module Alchemy
-  class Language < ActiveRecord::Base
-    belongs_to :site, required: true
+  class Language < BaseRecord
+    belongs_to :site
     has_many :pages
 
     before_validation :set_locale, if: -> { locale.blank? }
@@ -47,10 +47,10 @@ module Alchemy
       if: -> { default_changed? && self != Language.default }
 
     after_update :set_pages_language,
-      if: -> { language_code_changed? || country_code_changed? }
+      if: :should_set_pages_language?
 
     after_update :unpublish_pages,
-      if: -> { changes[:public] == [true, false] }
+      if: :should_unpublish_pages?
 
     before_destroy :check_for_default
     after_destroy :delete_language_root_page
@@ -62,8 +62,8 @@ module Alchemy
 
     class << self
       # Store the current language in the current thread.
-      def current=(v)
-        RequestStore.store[:alchemy_current_language] = v
+      def current=(language)
+        RequestStore.store[:alchemy_current_language] = language
       end
 
       # Current language from current thread or default.
@@ -153,6 +153,14 @@ module Alchemy
       lang.save(validate: false)
     end
 
+    def should_set_pages_language?
+      if active_record_5_1?
+        saved_change_to_language_code? || saved_change_to_country_code?
+      else
+        language_code_changed? || country_code_changed?
+      end
+    end
+
     def set_pages_language
       pages.update_all language_code: code
     end
@@ -163,6 +171,14 @@ module Alchemy
 
     def delete_language_root_page
       root_page.try(:destroy) && layout_root_page.try(:destroy)
+    end
+
+    def should_unpublish_pages?
+      if active_record_5_1?
+        saved_changes[:public] == [true, false]
+      else
+        changes[:public] == [true, false]
+      end
     end
 
     def unpublish_pages

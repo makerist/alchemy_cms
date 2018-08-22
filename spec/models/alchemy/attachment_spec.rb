@@ -1,9 +1,10 @@
-# encoding: utf-8
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Alchemy
   describe Attachment do
-    let(:file)       { File.new(File.expand_path('../../../fixtures/image with spaces.png', __FILE__)) }
+    let(:file)       { File.new(File.expand_path('../../fixtures/image with spaces.png', __dir__)) }
     let(:attachment) { Attachment.new(file: file) }
 
     describe 'after assign' do
@@ -28,6 +29,24 @@ module Alchemy
 
         it "should not change name" do
           expect { save }.to_not change { attachment.name }
+        end
+      end
+
+      context 'assigned to contents' do
+        let(:attachment) { create(:alchemy_attachment) }
+
+        let(:content) do
+          create(:alchemy_content, :essence_file).tap do |content|
+            content.update_column(:updated_at, 3.hours.ago)
+          end
+        end
+
+        before do
+          content.essence.update(attachment: attachment)
+        end
+
+        it 'touches contents' do
+          expect { attachment.save }.to change { content.reload.updated_at }
         end
       end
     end

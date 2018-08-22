@@ -37,10 +37,10 @@
 #
 
 module Alchemy
-  class Page < ActiveRecord::Base
+  class Page < BaseRecord
     include Alchemy::Hints
     include Alchemy::Logger
-    include Alchemy::Touching
+    include Alchemy::Taggable
 
     DEFAULT_ATTRIBUTES_FOR_COPY = {
       do_not_autogenerate: true,
@@ -82,12 +82,11 @@ module Alchemy
       :layoutpage
     ]
 
-    acts_as_taggable
     acts_as_nested_set(dependent: :destroy)
 
     stampable stamper_class_name: Alchemy.user_class_name
 
-    belongs_to :language, required: false
+    belongs_to :language, optional: true
 
     has_one :site, through: :language
     has_many :site_languages, through: :site, source: :languages
@@ -123,7 +122,7 @@ module Alchemy
       unless: :systempage?
 
     after_update :create_legacy_url,
-      if: :urlname_changed?,
+      if: :should_create_legacy_url?,
       unless: :redirects_to_external?
 
     # Concerns
@@ -483,9 +482,22 @@ module Alchemy
       self.language_code = language.code
     end
 
+    def should_create_legacy_url?
+      if active_record_5_1?
+        saved_change_to_urlname?
+      else
+        urlname_changed?
+      end
+    end
+
     # Stores the old urlname in a LegacyPageUrl
     def create_legacy_url
-      legacy_urls.find_or_create_by(urlname: urlname_was)
+      if active_record_5_1?
+        former_urlname = urlname_before_last_save
+      else
+        former_urlname = urlname_was
+      end
+      legacy_urls.find_or_create_by(urlname: former_urlname)
     end
 
     def set_published_at

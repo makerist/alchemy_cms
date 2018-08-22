@@ -1,5 +1,5 @@
 // Some table columns also have .message class
-.message:not(th, td) {
+div.message {
   padding: 8px 8px 8px 32px;
   line-height: 17px;
   border-width: $default-border-width;
@@ -10,7 +10,7 @@
   text-align: left;
 
   h1 {
-    font-size: 14px;
+    font-size: 1.2em;
     margin: 8px 0;
   }
 
@@ -20,10 +20,11 @@
     position: absolute;
     left: 8px;
     top: 10px;
+    color: inherit;
   }
 
   &.footnote {
-    font-size: 10px;
+    font-size: $small-font-size;
     margin: 16px;
   }
 

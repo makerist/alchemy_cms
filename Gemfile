@@ -2,17 +2,17 @@ source 'https://rubygems.org'
 
 gemspec
 
+gem 'rails', '~> 5.2.0'
+
 # Profiling
 gem 'rack-mini-profiler', group: :development, require: false
 
 gem 'sqlite3' if ENV['DB'].nil? || ENV['DB'] == 'sqlite'
-gem 'mysql2', '~> 0.3.18' if ENV['DB'] == 'mysql'
-gem 'pg',     '~> 0.21'   if ENV['DB'] == 'postgresql'
+gem 'mysql2', '~> 0.5.1' if ENV['DB'] == 'mysql'
+gem 'pg',     '~> 1.0'   if ENV['DB'] == 'postgresql'
 gem 'sassc-rails'
 
 group :development, :test do
-  gem 'jasmine-rails',        github: 'searls/jasmine-rails'
-  gem 'jasmine-jquery-rails', github: 'travisjeffery/jasmine-jquery-rails'
   gem 'simplecov', require: false
   if ENV['TRAVIS']
     gem 'codeclimate-test-reporter', '~> 1.0', require: false
@@ -28,9 +28,11 @@ group :development, :test do
     gem 'spring-commands-rspec'
     gem 'rubocop', require: false
     gem 'listen'
+    gem 'localeapp', '~> 3.0', require: false
+    gem 'dotenv', '~> 2.2'
   end
-  gem 'capybara', '~> 2.4'
-  gem 'capybara-screenshot', '>= 1.0.18'
+  gem 'capybara', '~> 3.0'
+  gem 'capybara-screenshot', '~> 1.0'
   gem 'database_cleaner', '~> 1.3'
   gem 'factory_bot_rails', '~> 4.5'
   gem 'selenium-webdriver', '~> 3.8'
@@ -42,6 +44,6 @@ end
 
 # We need this if we want to start the dummy app in production, ie on Teatro.io
 group :production do
-  gem 'uglifier', '>= 1.0.3'
+  gem 'uglifier', '>= 2.7.2'
   gem 'therubyracer'
 end

@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/AlchemyCMS/alchemy_cms.svg?branch=master)](https://travis-ci.org/AlchemyCMS/alchemy_cms)
 [![Maintainability](https://api.codeclimate.com/v1/badges/196c56c56568ed24a697/maintainability)](https://codeclimate.com/github/AlchemyCMS/alchemy_cms/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/196c56c56568ed24a697/test_coverage)](https://codeclimate.com/github/AlchemyCMS/alchemy_cms/test_coverage)
-[![Slack Status](http://slack.alchemy-cms.com/badge.svg)](http://slack.alchemy-cms.com)
+[![Slack Status](http://slackin.alchemy-cms.com/badge.svg)](http://slackin.alchemy-cms.com)
 
 **CAUTION: This master branch is a development branch that *can* contain bugs. For productive environments you should use the [current Ruby gem version](https://rubygems.org/gems/alchemy_cms), or the [latest stable branch (4.0-stable)](https://github.com/AlchemyCMS/alchemy_cms/tree/4.0-stable).**
 
@@ -31,6 +31,16 @@ Read more about Alchemy on the [website](https://alchemy-cms.com) and in the [gu
 - Flexible caching
 - Hostable on any Server that supports Ruby on Rails, a SQL Database and ImageMagick
 
+## Demo
+
+Deploy your own free demo on Heroku
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/AlchemyCMS/alchemy-demo)
+
+or visit the existing demo at https://alchemy-demo.herokuapp.com
+
+- Login: `demo`
+- Password: `demo123`
 
 ## Rails Version
 
@@ -68,14 +78,6 @@ gem 'alchemy_cms', github: 'AlchemyCMS/alchemy_cms', branch: 'master'
 ```
 
 **NOTE:** You normally want to use a stable branch, like `4.0-stable`.
-
-If you want to use Russian translation and have better i18n support, you should put:
-
-```ruby
-gem 'russian', '~> 0.6.0'
-```
-
-or gem with similar functionality into your Gemfile.
 
 #### 2. Update your bundle:
 
@@ -190,6 +192,9 @@ Please follow the guidelines about picture caching on the Dragonfly homepage for
 
 http://markevans.github.io/dragonfly/cache
 
+### Localization
+
+Alchemy ships with one default English translation for the admin interface. If you want to use the admin interface in other languages please have a look at the [`alchemy_i18n` project](https://github.com/AlchemyCMS/alchemy_cms).
 
 ## Upgrading
 

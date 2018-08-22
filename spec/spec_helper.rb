@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'simplecov'
 if ENV['TRAVIS']
   require 'codeclimate-test-reporter'
@@ -12,7 +14,8 @@ end
 # Configure Rails Environment
 ENV["RAILS_ENV"] = "test"
 
-require File.expand_path("../dummy/config/environment.rb", __FILE__)
+require_relative('dummy/config/environment.rb')
+
 require 'rspec/rails'
 require 'selenium/webdriver'
 require 'capybara/rails'
@@ -44,11 +47,6 @@ Rails.backtrace_cleaner.remove_silencers!
 # Disable rails loggin for faster IO. Remove this if you want to have a test.log
 Rails.logger.level = 4
 
-# Fix for MySQL with ActsAsTaggableOn 5
-if ENV['DB'] == 'mysql'
-  ActsAsTaggableOn.force_binary_collation = true
-end
-
 # Configure capybara for integration testing
 Capybara.register_driver :selenium_chrome_headless do |app|
   browser_options = ::Selenium::WebDriver::Chrome::Options.new
@@ -63,6 +61,7 @@ Capybara.javascript_driver = :selenium_chrome_headless
 Capybara.default_driver = :rack_test
 Capybara.default_selector = :css
 Capybara.ignore_hidden_elements = false
+Capybara.server = :webrick
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|

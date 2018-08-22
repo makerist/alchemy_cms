@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 class DummyUser < ActiveRecord::Base
-  attr_accessor :alchemy_roles, :name
+  has_many :folded_pages, class_name: 'Alchemy::FoldedPage'
+  attr_writer :alchemy_roles, :name
 
   def self.logged_in
     []

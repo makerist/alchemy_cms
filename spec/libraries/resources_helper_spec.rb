@@ -1,5 +1,8 @@
-require File.dirname(__FILE__) + "/../../lib/alchemy/resource"
-require File.dirname(__FILE__) + "/../../lib/alchemy/resources_helper"
+# frozen_string_literal: true
+
+require_relative '../../lib/alchemy/i18n'
+require_relative '../../lib/alchemy/resource'
+require_relative '../../lib/alchemy/resources_helper'
 
 module Namespace
   class MyResource
@@ -179,37 +182,69 @@ describe Alchemy::ResourcesHelper do
         end
       end
     end
+
+    context 'format of timestamps' do
+      let(:attributes) do
+        {
+          name: :created_at,
+          type: :datetime
+        }
+      end
+
+      let(:now) { Time.current.to_datetime }
+
+      before do
+        allow(resource_item).to receive(:created_at) { now }
+      end
+
+      it 'formats the time with alchemy default format' do
+        expect(controller).to receive(:l).with(now, format: :'alchemy.default')
+        subject
+      end
+
+      context 'with options[:datetime_format] set to other format' do
+        let(:options) { {datetime_format: 'OTHR'} }
+
+        it 'uses this format' do
+          expect(controller).to receive(:l).with(now, format: 'OTHR')
+          subject
+        end
+      end
+    end
+
+    context 'format of time values' do
+      let(:attributes) do
+        {
+          name: :created_at,
+          type: :time
+        }
+      end
+
+      let(:now) { Time.current }
+
+      before do
+        allow(resource_item).to receive(:created_at) { now }
+      end
+
+      it 'formats the time with alchemy datetime format' do
+        expect(controller).to receive(:l).with(now, format: :'alchemy.time')
+        subject
+      end
+
+      context 'with options[:time_format] set to other format' do
+        let(:options) { {time_format: 'OTHR'} }
+
+        it 'uses this format' do
+          expect(controller).to receive(:l).with(now, format: 'OTHR')
+          subject
+        end
+      end
+    end
   end
 
   describe "#resource_name" do
     it "returns resource_handler.resource_name" do
       expect(controller.resource_name).to eq("my_resource")
-    end
-  end
-
-  describe '#current_location_params' do
-    let(:params) do
-      {
-        q: "some_query",
-        page: 6,
-        action: "some_action",
-        filter: "some_filter",
-        tagged_with: "some_tag"
-      }
-    end
-
-    before do
-      allow(controller).to receive(:params) { params }
-    end
-
-    it 'returns the current location params' do
-      expect(controller.current_location_params).to eq(
-        {q: "some_query", page: 6, filter: "some_filter", tagged_with: "some_tag"}
-      )
-    end
-
-    it 'only includes the q and page parameters' do
-      expect(controller.current_location_params).not_to have_key(:action)
     end
   end
 end
